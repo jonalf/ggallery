@@ -63,14 +63,12 @@ def logout():
     credentials = OAuth2Credentials.from_json(session['credentials'])
     if credentials.access_token_expired:
         return redirect(url_for('root'))
-    
+
     session.pop('credentials')
     session.pop('user')
     return redirect( url_for('root') )
 
 
-
-    
 if __name__ == '__main__':
     #context = ('devcerts/ontrkr-dev.crt', 'devcerts/ontrkr-dev.key')
     app.debug = True
