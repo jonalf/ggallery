@@ -31,8 +31,7 @@ def require_login(f):
 @app.route('/', methods=['POST', 'GET'])
 @require_login
 def root():
-    hrs = db.get_homeroom_list( session['user'] )
-    return render_template("homepage.html", hrs = hrs, user = session['user'])
+    return render_template("homepage.html", user = session['user'])
 
 @app.route('/authenticate', methods=['POST', 'GET'])
 def authenticate():

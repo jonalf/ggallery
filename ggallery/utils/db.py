@@ -4,114 +4,103 @@ from os import remove, stat, path
 DIR = path.dirname(__file__) or '.'
 DIR += '/'
 DBFILE = DIR + 'ggallery.db'
+USER_FILE = DIR + '../data/users.csv'
+
+USER = 0
+ADMIN = 1
+
+VISIBLE = 0
+EDITABLE = 1
+
+YEAR = 2017
 
 #create the database
 def setup():
-    pass
-
-#LEFT IN CURRENTLY AS EXAMPLES
-def build_students():
-    f = open( STUDENT_FILE )
-    students = csv.DictReader( f )
-
+    build_galleries()
+    build_users()
+    build_images(YEAR)
+    
+def build_galleries():
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
 
     try:
-        cmd = "DROP TABLE students"
+        cmd = "DROP TABLE galleries"
         cur.execute( cmd )
         db.commit()
     except:
-        print "students table does not exist"
+        print "galleries table does not exist"
 
-    cmd = 'CREATE TABLE students (' + '"%s" TEXT, '*(len(STUDENT_FIELDS)-1) + '"%s" TEXT)'
-    cmd = cmd%tuple(STUDENT_FIELDS)
-    cur.execute( cmd )
+    cmd = 'CREATE TABLE galleries (id INTEGER PRIMARY KEY, name TEXT, year INTEGER, perm INTEGER, size INTEGER)'
+    cur.execute(cmd)
     db.commit()
 
-    
-    for student in students:
-        
-        cmd = 'INSERT INTO students VALUES(' + '"%s", '*(len(STUDENT_FIELDS)-1) + '"%s")'
-        cmd = cmd% tuple( [student[k] for k in STUDENT_FIELDS] )
-        print cmd
-        cur.execute( cmd )
+def add_gallery(name, year, permission):
+    db = sqlite3.connect( DBFILE )
+    cur = db.cursor()
 
+    cmd = 'INSERT INTO galleries VALUES(null, "%s", "%d", %d, 0)'%(name, year, permission)
+    cur.execute(cmd)
     db.commit()
-    db.close()
-    f.close()
 
-def build_faculty():
-    f = open( FACULTY_FILE )
-    hrs = csv.DictReader( f )
-    
+def build_users():
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
 
     try:
-        cmd = "DROP TABLE faculty"
+        cmd = "DROP TABLE users"
         cur.execute( cmd )
         db.commit()
     except:
-        print "faculty table does not exist"
-        
-    cmd = 'CREATE TABLE faculty (id TEXT, hr TEXT)'
-    cur.execute( cmd )
+        print "users table does not exist"
+
+    cmd = 'CREATE TABLE users (id INTEGER PRIMARY KEY, stuyd TEXT, name TEXT, priv INTEGER)'
+    cur.execute(cmd)
+    db.commit()
+    populate_users()
+
+def add_user(stuyd, name, priv):
+    db = sqlite3.connect( DBFILE )
+    cur = db.cursor()
+    cmd = 'INSERT INTO users VALUES(null, "%s", "%s", "%d")'%(stuyd, name, priv)
+    cur.execute(cmd)
     db.commit()
 
-    for h in hrs:
-        cmd = 'INSERT INTO faculty VALUES("{id}", "{hr}")'.format(id = h['id'], hr = h['hr'])
-        print cmd
-        cur.execute(cmd)
+def populate_users():
+    f = open(USER_FILE)
+    users = csv.DictReader(f)
+    for user in users:
+        rights = USER
+        if user['rights'] == 'admin':
+            rights = ADMIN
+        add_user(user['stuyd'], user['name'], rights)
 
+def build_images(year):
+    db = sqlite3.connect( DBFILE )
+    cur = db.cursor()
+    try:
+        cmd = "DROP TABLE images_%d"%year
+        cur.execute( cmd )
+        db.commit()
+    except:
+        print "images table does not exist"
+    cmd = 'CREATE TABLE images_%d (id INTEGER PRIMARY KEY, author TEXT, gallery TEXT)'%year
+    cur.execute(cmd)
     db.commit()
-    db.close()
-    f.close()
 
+def add_image(author, year, gallery):
+    db = sqlite3.connect( DBFILE )
+    cur = db.cursor()
+    cmd = 'INSERT INTO images_%d VALUES(null, "%s", "%s")'%(year, author, gallery)
+    cur.execute(cmd)
+    image_id = cur.lastrowid
+    db.commit()
+    cmd = 'UPDATE galleries SET size = size + 1 WHERE name = "%s" AND year = %d'%(gallery, year)
+    return image_id
 
 def valid_user( fid ):
-    db = sqlite3.connect( DBFILE )
-    cur = db.cursor()
-    cmd = 'SELECT * FROM faculty where id = "{fid}"'.format(fid = fid)
-    cur.execute(cmd)
-    return cur.fetchone()
-    
-def get_student( osis ):
-    db = sqlite3.connect( DBFILE )
-    cur = db.cursor()
-    student = {}
-    student ['osis'] = osis
+    return True
 
-    #Get personal info first
-    cmd = 'SELECT %s, %s, %s, %s, %s  FROM students where StudentID = '%tuple(STUDENT_FIELDS[1:6]) + osis 
-    s = cur.execute( cmd ).fetchone()
 
-    student['first'] = s[1]
-    student['last'] = s[0]
-    student['grade'] = s[2]
-    student['hr'] = s[3]
-
-    #Get class info
-    cmd = 'SELECT %s, %s, %s, "%s", %s FROM students WHERE StudentID = '%tuple(STUDENT_FIELDS[6:]) + osis
-    s = cur.execute( cmd )
-
-    courses = {}
-    for key in SUBJECTS:
-        courses[key] = []
-    for c in s:
-        course = {}
-        course['year'] = c[0]
-        course['term'] = c[1]
-        course['course'] = c[2]
-        course['course title'] = c[3]
-        course['mark'] = c[4]        
-        course['requirements'] = get_requirements( c[2] )
-        subject = get_subject( c[2] )
-        courses[subject].append( course )
-            
-    for key in courses:
-        courses[key].sort( course_compare )
-        
-    student['courses'] = courses
-    
-    return student
+if __name__ == '__main__':
+    setup()
