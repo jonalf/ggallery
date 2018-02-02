@@ -3,12 +3,8 @@
 {% block content %}
 
 <div class="container">
-  <h2>Welcome</h2>
+  <h2>{{gallery_name}}</h2>
   <hr>
-  {% for gallery in galleries %}
-  <a href="{{ url_for('gallery_view', gallery_name=gallery)}}">{{ gallery }}</a>
-  <br>
-  {% endfor %}
 </div> <!-- /container -->
 
 {% endblock %}

@@ -1,18 +1,21 @@
-from flask import Flask, url_for, redirect, render_template, request, flash, session
+from flask import Flask, url_for, redirect, render_template, request, flash, session, Markup
 from oauth2client.client import flow_from_clientsecrets, OAuth2Credentials # OAuth library, import the function and class that this use
 from httplib2 import Http # The http library to issue REST calls to the oauth api
 #from OpenSSL import SSL
 from functools import wraps
-from utils import db
+from utils import db, filer
 import json
 import os
+from wand.image import Image
 
 app = Flask(__name__)
 app.secret_key = 'NOT SO SECRET'
 
+
+ALLOWED_TYPES = filer.ALLOWED_TYPES
 DIR = os.path.dirname(__file__) or '.'
 CLIENT_SECRETS = DIR + '/client_secrets.json'
-
+YEAR = db.YEAR
 ADMIN_USERS = ['dw']
 
 #authentication wrapper
@@ -31,14 +34,54 @@ def require_login(f):
 @app.route('/', methods=['POST', 'GET'])
 @require_login
 def root():
-    return render_template("homepage.html", user = session['user'])
+    galleries = db.get_visible_galleries()
+    gallery_names = []
+    for gallery in galleries:
+        gallery_names.append(gallery[1])
+    return render_template("homepage.html", user = session['user'], galleries = gallery_names)
 
+@app.route('/upload', methods=['POST', 'GET'])
+@require_login
+def upload():
+    return render_template("upload.html")
+
+@app.route('/send_file', methods=['POST'])
+def save_file():
+    gallery = 'intro'
+    img_file = request.files['img_file']
+    img_code = Markup.escape(request.form['img_code'])
+    if img_file.filename == '':
+        flash('No File Selected')
+        return redirect(url_for('upload'))
+
+    img = Image(file=img_file)
+    if img.format not in ALLOWED_TYPES:
+        flash('Your image must be a .png, .gif or .jpg file')
+        return redirect(url_for('upload'))
+    img_id = db.add_image( session['user'], YEAR, gallery, img.format, img_code)
+    if img_id < 1:
+        flash('There was an error uploading your image, please try again')
+    save_check = filer.add_file(img, img_id, img_code)
+    if not save_check:
+        flash('There was an error uploading your image, please try again. Make sure your image is a .png, .gif or .jpg file')
+        return redirect(url_for('upload'))
+    return redirect(url_for('root'))
+
+@app.route('/gallery/<gallery_name>', methods=['GET'])
+def gallery_view(gallery_name):
+    return render_template('gallery.html', user=session['user'], gallery_name=gallery_name)
+
+
+
+
+
+#EVERYTHING BELOW HERE IS FOR AUTHENTICATION
 @app.route('/authenticate', methods=['POST', 'GET'])
 def authenticate():
     flow = flow_from_clientsecrets(CLIENT_SECRETS,
                                    scope = 'https://www.googleapis.com/auth/userinfo.email',
                                    redirect_uri = url_for('authenticate', _external = True))
-    
+
     if 'code' not in request.args: #first step of authentication
         auth_uri = flow.step1_get_authorize_url() #google login page
         return redirect(auth_uri) # Redirects to that page

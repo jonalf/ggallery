@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h2>File Upload</h2>
+  <hr>
+  {% set messages = get_flashed_messages() %}
+  {% for message in messages %}
+  <h3> {{ message }} </h3>
+  {% endfor %}
+
+  <form action="/send_file" method="POST" enctype="multipart/form-data">
+    <input type="file" name="img_file">
+    <textarea name="img_code"></textarea>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div> <!-- /container -->
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='scripts.js') }}"></script>
+
+{% endblock %}
