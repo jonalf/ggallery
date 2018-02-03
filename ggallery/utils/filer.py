@@ -6,7 +6,7 @@ DIR = os.path.dirname(__file__) or '.'
 DIR += '/'
 DATA_DIR = DIR + '../static/images/'
 
-YEAR = 2017
+YEAR = db.YEAR
 THUMB_SIZE = 200
 SCALE_SIZE = 500
 

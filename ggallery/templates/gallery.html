@@ -24,6 +24,8 @@
 
 <div class="container">
   <h2>{{gallery_name}}</h2>
+  <br>
+  Click on an image for a larger version and code (if available)
   <hr>
   <div class="row">
     {% for image in images %}
@@ -33,7 +35,7 @@
       {% if image['title'] %}
       {{ image['title'] }}
       {% endif %}
-      <img src="{{ url_for('static', filename='images/2017/thumbs/'+image['image']) }}">
+      <img src="{{ url_for('static', filename='images/%d/thumbs/%s'%(year, image['image'])) }}">
       <br>
       {{image['author']}}
     </div>

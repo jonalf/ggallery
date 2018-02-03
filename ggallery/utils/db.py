@@ -12,7 +12,7 @@ ADMIN = 1
 VISIBLE = 0
 EDITABLE = 1
 
-YEAR = 2017
+YEAR = 2018
 
 #create the database
 def setup():
@@ -21,6 +21,11 @@ def setup():
     build_images(YEAR)
     build_code(YEAR)
     add_gallery('intro', YEAR, EDITABLE)
+
+def setup_year():
+    build_users()
+    build_images(YEAR)
+    build_code(YEAR)
 
 def build_galleries():
     db = sqlite3.connect( DBFILE )

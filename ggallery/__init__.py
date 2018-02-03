@@ -3,6 +3,15 @@
 #do this on mac: export MAGICK_HOME="/usr/local/Cellar/imagemagick@6/6.9.9-31" (check version #)
 #taken from https://stackoverflow.com/questions/37011291/python-wand-image-is-not-recognized
 
+#SETUP INSTRUCTIONS (for now)
+#NEW YEAR:
+#    change db.YEAR
+#    update data/users.csv if needed
+#    db.setup_year()
+#    filer.setup_year()
+#NEW GALLERY
+#    db.add_gallery(<name>, YEAR, EDITABLE)
+
 
 from flask import Flask, url_for, redirect, render_template, request, flash, session, Markup
 from oauth2client.client import flow_from_clientsecrets, OAuth2Credentials # OAuth library, import the function and class that this use
@@ -90,7 +99,7 @@ def gallery_view(gallery_name=None):
         uname = session['user']
     else:
         uname = 'login'
-    return render_template('gallery.html', user=uname, gallery_name=gallery_name, images=images)
+    return render_template('gallery.html', user=uname, gallery_name=gallery_name, images=images, year=YEAR)
 
 @app.route('/get_image', methods=['POST'])
 def get_image():
@@ -98,7 +107,7 @@ def get_image():
         return ''
     image_id = request.form['image_id']
     image_info = {}
-    image_info['scale'] = url_for('static', filename='images/2017/scale/%s'%image_id);
+    image_info['scale'] = url_for('static', filename='images/%d/scale/%s'%(YEAR, image_id));
     image_info['code'] = filer.get_code(int(image_id.split('.')[0]))
     return json.dumps(image_info)
 
