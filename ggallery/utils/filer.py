@@ -3,7 +3,7 @@ from wand.image import Image
 
 DIR = os.path.dirname(__file__) or '.'
 DIR += '/'
-DATA_DIR = DIR + '../data/'
+DATA_DIR = DIR + '../static/images/'
 
 YEAR = 2017
 THUMB_SIZE = 200

@@ -4,6 +4,11 @@
 
 <div class="container">
   <h2>Welcome</h2>
+  {% set messages = get_flashed_messages() %}
+  {% for message in messages %}
+  <h3> {{ message }} </h3>
+  {% endfor %}
+
   <hr>
   {% for gallery in galleries %}
   <a href="{{ url_for('gallery_view', gallery_name=gallery)}}">{{ gallery }}</a>

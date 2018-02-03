@@ -156,9 +156,30 @@ def get_editable_galleries():
     galleries = cur.fetchall()
     return galleries
 
+def lookup_user(stuyd):
+    db = sqlite3.connect( DBFILE )
+    cur = db.cursor()
+    cmd = 'SELECT * FROM users WHERE stuyd = "%s"'%stuyd
+    cur.execute(cmd)
+    user = cur.fetchone()
+    if not user:
+        return false
+    return {'stuyd':user[1], 'name':user[2], 'rights':user[3]}
 
-def valid_user( fid ):
-    return True
+def get_user_name(stuyd):
+    return lookup_user(stuyd)['name']
+
+def get_image_list(gallery):
+    db = sqlite3.connect( DBFILE )
+    cur = db.cursor()
+    cmd = 'SELECT * FROM images_%d WHERE gallery = "%s"'%(YEAR, gallery)
+    cur.execute(cmd)
+    images = cur.fetchall()
+    image_list = []
+    for image in images:
+        author = get_user_name(image[1])
+        image_list.append( {'image':'%d.%s'%(image[0], image[3]),'author':author})
+    return image_list
 
 
 if __name__ == '__main__':

@@ -1,3 +1,9 @@
+#NOTE
+#The imagemagick path in version 7 is incompatiable with wand
+#do this on mac: export MAGICK_HOME="/usr/local/Cellar/imagemagick@6/6.9.9-31"
+#taken from https://stackoverflow.com/questions/37011291/python-wand-image-is-not-recognized
+
+
 from flask import Flask, url_for, redirect, render_template, request, flash, session, Markup
 from oauth2client.client import flow_from_clientsecrets, OAuth2Credentials # OAuth library, import the function and class that this use
 from httplib2 import Http # The http library to issue REST calls to the oauth api
@@ -22,7 +28,6 @@ ADMIN_USERS = ['dw']
 def require_login(f):
     @wraps(f)
     def inner(*args, **kwargs):
-        print 'inner'
         if 'user' not in session:
             print 'not logged in'
             return render_template("base.html", message = 'Please sign in above with your stuy.edu account', user = 'Sign In')
@@ -32,20 +37,24 @@ def require_login(f):
 
 
 @app.route('/', methods=['POST', 'GET'])
-@require_login
 def root():
     galleries = db.get_visible_galleries()
     gallery_names = []
     for gallery in galleries:
         gallery_names.append(gallery[1])
-    return render_template("homepage.html", user = session['user'], galleries = gallery_names)
+        if 'user' in session:
+            uname = session['user']
+        else:
+            uname = 'login'
+    return render_template("homepage.html", user=uname, galleries = gallery_names)
 
 @app.route('/upload', methods=['POST', 'GET'])
 @require_login
 def upload():
-    return render_template("upload.html")
+    return render_template("upload.html", user=session['user'])
 
 @app.route('/send_file', methods=['POST'])
+@require_login
 def save_file():
     gallery = 'intro'
     img_file = request.files['img_file']
@@ -68,8 +77,16 @@ def save_file():
     return redirect(url_for('root'))
 
 @app.route('/gallery/<gallery_name>', methods=['GET'])
-def gallery_view(gallery_name):
-    return render_template('gallery.html', user=session['user'], gallery_name=gallery_name)
+@app.route('/gallery', methods=['GET'])
+def gallery_view(gallery_name=None):
+    if not gallery_name:
+        return redirect(url_for('root'))
+    images = db.get_image_list(gallery_name)
+    if 'user' in session:
+        uname = session['user']
+    else:
+        uname = 'login'
+    return render_template('gallery.html', user=uname, gallery_name=gallery_name, images=images)
 
 
 
@@ -91,13 +108,13 @@ def authenticate():
         session['credentials'] = credentials.to_json() #convert cred to json
         c = json.loads(session['credentials'])
         (user, domain) = tuple(c['id_token']['email'].split('@'))
-        print user
-        print domain
-        if domain == 'stuy.edu' and db.valid_user( user ):
+        user_details = db.lookup_user( user )
+        if domain == 'stuy.edu' and user_details:
             session['user'] = user
+            session['name'] = user_details['name']
             return redirect(url_for('root'))
         else:
-            return render_template("base.html", message = (user + ' is not an approved user for this serive.'), user = 'Sign in')
+            return render_template("homepage.html", message = (user + ' is not an approved user for this serive.'), user = 'Sign in')
 
 @app.route('/logout', methods=["POST", 'GET'])
 @require_login
@@ -108,11 +125,10 @@ def logout():
 
     session.pop('credentials')
     session.pop('user')
+    session.pop('name')
     return redirect( url_for('root') )
 
 
 if __name__ == '__main__':
-    #context = ('devcerts/ontrkr-dev.crt', 'devcerts/ontrkr-dev.key')
     app.debug = True
-    #app.run(ssl_context=context, threaded=True)
     app.run()
