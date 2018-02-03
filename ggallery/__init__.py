@@ -1,6 +1,6 @@
 #NOTE
 #The imagemagick path in version 7 is incompatiable with wand
-#do this on mac: export MAGICK_HOME="/usr/local/Cellar/imagemagick@6/6.9.9-31"
+#do this on mac: export MAGICK_HOME="/usr/local/Cellar/imagemagick@6/6.9.9-31" (check version #)
 #taken from https://stackoverflow.com/questions/37011291/python-wand-image-is-not-recognized
 
 
@@ -49,14 +49,20 @@ def root():
 @require_login
 def upload():
     galleries = db.get_visible_galleries()
-    return render_template("upload.html", user=session['user'])
+    return render_template("upload.html", user=session['user'], galleries = galleries)
 
 @app.route('/send_file', methods=['POST'])
 @require_login
 def save_file():
-    gallery = 'intro'
+    if ('gallery' not in request.form or
+        request.form['gallery'] == 'Pick one'):
+        flash('Please select the correct assignment gallery.')
+        return redirect(url_for('upload'))
+
+    gallery = request.form['gallery']
     img_file = request.files['img_file']
     img_code = Markup.escape(request.form['img_code'])
+    img_title = Markup.escape(request.form['title'])
     if img_file.filename == '':
         flash('No File Selected')
         return redirect(url_for('upload'))
@@ -65,7 +71,7 @@ def save_file():
     if img.format not in ALLOWED_TYPES:
         flash('Your image must be a .png, .gif or .jpg file')
         return redirect(url_for('upload'))
-    img_id = db.add_image( session['user'], YEAR, gallery, img.format, img_code)
+    img_id = db.add_image( session['user'], YEAR, gallery, img.format, img_code, img_title)
     if img_id < 1:
         flash('There was an error uploading your image, please try again')
     save_check = filer.add_file(img, img_id, img_code)
@@ -86,8 +92,15 @@ def gallery_view(gallery_name=None):
         uname = 'login'
     return render_template('gallery.html', user=uname, gallery_name=gallery_name, images=images)
 
-
-
+@app.route('/get_image', methods=['POST'])
+def get_image():
+    if 'image_id' not in request.form:
+        return ''
+    image_id = request.form['image_id']
+    image_info = {}
+    image_info['scale'] = url_for('static', filename='images/2017/scale/%s'%image_id);
+    image_info['code'] = filer.get_code(int(image_id.split('.')[0]))
+    return json.dumps(image_info)
 
 
 #EVERYTHING BELOW HERE IS FOR AUTHENTICATION

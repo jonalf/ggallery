@@ -11,11 +11,42 @@
   {% endfor %}
   Use this form to upload an image. You may also provide a title and code snippet. If you do include code, just include the code relevant to the creation of the image itself.<br>
   Image formats are restricted to PNG, GIF and JPEG. Images smaller than 500x500 pixels will be enlarged.
+  <br>
+  <br>
   <form action="/send_file" method="POST" enctype="multipart/form-data">
-
-    <input type="file" name="img_file">
-    <textarea name="img_code"></textarea>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <div class="form-group">
+      <div class="form-group-row">
+        <label for="gallery" class="col-sm-3 col-form-label">Assignment</label>
+        <div class="col-sm-9">
+          <select class="form-control" id="gallery" name="gallery">
+            <option>Pick one</option>
+            {% for gallery in galleries %}
+            <option>{{gallery}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="col-sm-offset-3 col-sm-9">
+        <input type="file" class="form-control-file" id="img_file" name="img_file">
+      </div>
+    </div>
+    <div class="form-group-row">
+      <label for="title" class="col-sm-3 col-form-label">Image Title (optional)</label>
+      <div class="col-sm-9">
+        <input type="text" class="form-control" id="title" name="title">
+      </div>
+    </div>
+    <div class="form-group-row">
+      <label for="img_code" class="col-sm-3 col-form-label">Image Code (optional)</label>
+      <div class="col-sm-9">
+        <textarea name="img_code" class="form-control" name="img_code" rows="10"></textarea>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-3 col-sm-9">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </div>
   </form>
 </div> <!-- /container -->
 

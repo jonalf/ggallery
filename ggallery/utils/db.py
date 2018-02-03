@@ -32,7 +32,6 @@ def build_galleries():
         db.commit()
     except:
         print "galleries table does not exist"
-
     cmd = 'CREATE TABLE galleries (id INTEGER PRIMARY KEY, name TEXT, year INTEGER, perm INTEGER, size INTEGER)'
     cur.execute(cmd)
     db.commit()
@@ -41,8 +40,9 @@ def add_gallery(name, year, permission):
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
 
-    cmd = 'INSERT INTO galleries VALUES(null, "%s", "%d", %d, 0)'%(name, year, permission)
-    cur.execute(cmd)
+    #cmd = 'INSERT INTO galleries VALUES(null, "%s", "%d", %d, 0)'%(name, year, permission)
+    cmd = 'INSERT INTO galleries VALUES(null, ?, ?, ?, 0)'
+    cur.execute(cmd, (name, year, permission))
     db.commit()
 
 def build_users():
@@ -64,8 +64,9 @@ def build_users():
 def add_user(stuyd, name, priv):
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
-    cmd = 'INSERT INTO users VALUES(null, "%s", "%s", "%d")'%(stuyd, name, priv)
-    cur.execute(cmd)
+    #cmd = 'INSERT INTO users VALUES(null, "%s", "%s", "%d")'%(stuyd, name, priv)
+    cmd = 'INSERT INTO users VALUES(null, ?, ?, ?)'
+    cur.execute(cmd, (stuyd, name, priv))
     db.commit()
 
 def populate_users():
@@ -86,7 +87,7 @@ def build_images(year):
         db.commit()
     except:
         print "images table does not exist"
-    cmd = 'CREATE TABLE images_%d (id INTEGER PRIMARY KEY, author TEXT, gallery TEXT, format TEXT)'%year
+    cmd = 'CREATE TABLE images_%d (id INTEGER PRIMARY KEY, author TEXT, gallery TEXT, format TEXT, title TEXT)'%year
     cur.execute(cmd)
     db.commit()
 
@@ -103,18 +104,19 @@ def build_code(year):
     cur.execute(cmd)
     db.commit()
 
-def add_image(author, year, gallery, img_format, code):
+def add_image(author, year, gallery, img_format, code, title):
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
-    cmd = 'INSERT INTO images_%d VALUES(null, "%s", "%s", "%s")'%(year, author, gallery, img_format)
-    cur.execute(cmd)
+    #cmd = 'INSERT INTO images_%d VALUES(null, "%s", "%s", "%s", "%s")'%(year, author, gallery, img_format, title)
+    cmd = 'INSERT INTO images_%d VALUES(null, ?, ?, ?, ?)'%year
+    cur.execute(cmd, (author, gallery, img_format, title))
     image_id = cur.lastrowid
     db.commit()
     if code:
-        cmd = 'INSERT INTO code_%d VALUES(%d, "%s", "%s")'%(year, image_id, author, gallery)
-        cur.execute(cmd)
-    cmd = 'UPDATE galleries SET size = size + 1 WHERE name = "%s" AND year = %d'%(gallery, year)
-    cur.execute(cmd)
+        cmd = 'INSERT INTO code_%d VALUES(?, ?, ?)'%year
+        cur.execute(cmd, (image_id, author, gallery))
+    cmd = 'UPDATE galleries SET size = size + 1 WHERE name = ? AND year = ?'
+    cur.execute(cmd, (gallery, year))
     db.commit()
     return image_id
 
@@ -122,18 +124,20 @@ def remove_image(id, year):
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
 
-    cmd = 'SELECT * FROM images_%d WHERE id=%d'%(year, id)
-    cur.execute(cmd)
+    #cmd = 'SELECT gallery, format FROM images_%d WHERE id=%d'%(year, id)
+    cmd = 'SELECT gallery, format FROM images_%d WHERE id=?'%year
+    cur.execute(cmd, (id,))
     entry = cur.fetchone()
-    gallery = entry[2]
-    img_format = entry[3]
+    gallery = entry[0]
+    img_format = entry[1]
 
-    cmd = 'DELETE FROM images_%d WHERE id=%d'%(year, id)
-    cur.execute(cmd)
-    cmd = 'DELETE FROM code_%d WHERE id=%d'%(year, id)
-    cur.execute(cmd)
-    cmd = 'UPDATE galleries SET size = size - 1 WHERE name = "%s" AND year = %d'%(gallery, year)
-    cur.execute(cmd)
+    #cmd = 'DELETE FROM images_%d WHERE id=%d'%(year, id)
+    cmd = 'DELETE FROM images_%d WHERE id=?'%year
+    cur.execute(cmd, (id,))
+    cmd = 'DELETE FROM code_%d WHERE id=?'%year
+    cur.execute(cmd, (id,))
+    cmd = 'UPDATE galleries SET size = size - 1 WHERE name = ? AND year = ?'
+    cur.execute(cmd, (gallery, year))
     db.commit()
     return img_format
 
@@ -141,8 +145,9 @@ def get_visible_galleries():
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
 
-    cmd = 'SELECT name FROM galleries WHERE (year = %d) AND (perm = %d or perm = %d)'%(YEAR, VISIBLE, EDITABLE)
-    cur.execute(cmd)
+    #cmd = 'SELECT name FROM galleries WHERE (year = %d) AND (perm = %d or perm = %d)'%(YEAR, VISIBLE, EDITABLE)
+    cmd = 'SELECT name FROM galleries WHERE (year = ?) AND (perm = ? or perm = ?)'
+    cur.execute(cmd, (YEAR, VISIBLE, EDITABLE))
     galleries = cur.fetchall()
     galleries = [x[0] for x in galleries]
     print galleries
@@ -152,16 +157,17 @@ def get_editable_galleries():
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
 
-    cmd = 'SELECT * FROM galleries WHERE year = %d AND perm = %d'%(YEAR, EDITABLE)
-    cur.execute(cmd)
+    #cmd = 'SELECT * FROM galleries WHERE year = %d AND perm = %d'%(YEAR, EDITABLE)
+    cmd = 'SELECT * FROM galleries WHERE year = ? AND perm = ?'
+    cur.execute(cmd, (YEAR, EDITABLE))
     galleries = cur.fetchall()
     return galleries
 
 def lookup_user(stuyd):
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
-    cmd = 'SELECT * FROM users WHERE stuyd = "%s"'%stuyd
-    cur.execute(cmd)
+    cmd = 'SELECT * FROM users WHERE stuyd = ?'
+    cur.execute(cmd, (stuyd,))
     user = cur.fetchone()
     if not user:
         return false
@@ -173,14 +179,24 @@ def get_user_name(stuyd):
 def get_image_list(gallery):
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
-    cmd = 'SELECT * FROM images_%d WHERE gallery = "%s"'%(YEAR, gallery)
-    cur.execute(cmd)
+    #cmd = 'SELECT * FROM images_%d WHERE gallery = "%s"'%(YEAR, gallery)
+    cmd = 'SELECT * FROM images_%d WHERE gallery = ?'%YEAR
+    cur.execute(cmd, (gallery,))
     images = cur.fetchall()
     image_list = []
     for image in images:
         author = get_user_name(image[1])
-        image_list.append( {'image':'%d.%s'%(image[0], image[3]),'author':author})
+        image_list.append( {'image':'%d.%s'%(image[0], image[3]),'author':author, 'title':image[4]})
     return image_list
+
+def code_exists(image_id):
+    db = sqlite3.connect( DBFILE )
+    cur = db.cursor()
+    #cmd = 'SELECT * FROM images_%d WHERE gallery = "%s"'%(YEAR, gallery)
+    cmd = 'SELECT * FROM code_%d WHERE id = ?'%YEAR
+    cur.execute(cmd, (image_id,))
+    result = cur.fetchone()
+    return result;
 
 if __name__ == '__main__':
     setup()

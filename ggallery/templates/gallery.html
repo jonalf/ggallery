@@ -28,7 +28,11 @@
   <div class="row">
     {% for image in images %}
 
-    <div class="col-sm-3" onclick="display_image('{{url_for('static', filename='images/2017/scale/'+image['image'])}}')">
+    <!-- <div class="col-sm-3" onclick="display_image('{{url_for('static', filename='images/2017/scale/'+image['image'])}}', '{{image['title']}}')"> -->
+    <div class="col-sm-3" onclick="display_image('{{image['image']}}', '{{image['title']}}')">
+      {% if image['title'] %}
+      {{ image['title'] }}
+      {% endif %}
       <img src="{{ url_for('static', filename='images/2017/thumbs/'+image['image']) }}">
       <br>
       {{image['author']}}

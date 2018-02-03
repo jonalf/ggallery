@@ -1,4 +1,5 @@
 import os
+import db
 from wand.image import Image
 
 DIR = os.path.dirname(__file__) or '.'
@@ -40,6 +41,13 @@ def add_file(img, img_id, code):
         f.close()
 
     return True
+
+def get_code(image_id):
+    path = DATA_DIR + str(YEAR)
+    if db.code_exists(image_id):
+        f = open('%s/code/%d.txt'%(path, image_id), 'r')
+        return f.read()
+    return ''
 
 def remove_file(img_id, img_format):
     path = DATA_DIR + str(YEAR)
