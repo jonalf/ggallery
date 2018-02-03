@@ -39,18 +39,16 @@ def require_login(f):
 @app.route('/', methods=['POST', 'GET'])
 def root():
     galleries = db.get_visible_galleries()
-    gallery_names = []
-    for gallery in galleries:
-        gallery_names.append(gallery[1])
-        if 'user' in session:
-            uname = session['user']
-        else:
-            uname = 'login'
-    return render_template("homepage.html", user=uname, galleries = gallery_names)
+    if 'user' in session:
+        uname = session['user']
+    else:
+        uname = 'login'
+    return render_template("homepage.html", user=uname, galleries = galleries)
 
 @app.route('/upload', methods=['POST', 'GET'])
 @require_login
 def upload():
+    galleries = db.get_visible_galleries()
     return render_template("upload.html", user=session['user'])
 
 @app.route('/send_file', methods=['POST'])

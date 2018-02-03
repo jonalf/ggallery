@@ -141,9 +141,10 @@ def get_visible_galleries():
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
 
-    cmd = 'SELECT * FROM galleries WHERE (year = %d) AND (perm = %d or perm = %d)'%(YEAR, VISIBLE, EDITABLE)
+    cmd = 'SELECT name FROM galleries WHERE (year = %d) AND (perm = %d or perm = %d)'%(YEAR, VISIBLE, EDITABLE)
     cur.execute(cmd)
     galleries = cur.fetchall()
+    galleries = [x[0] for x in galleries]
     print galleries
     return galleries
 
@@ -180,7 +181,6 @@ def get_image_list(gallery):
         author = get_user_name(image[1])
         image_list.append( {'image':'%d.%s'%(image[0], image[3]),'author':author})
     return image_list
-
 
 if __name__ == '__main__':
     setup()

@@ -9,8 +9,10 @@
   {% for message in messages %}
   <h3> {{ message }} </h3>
   {% endfor %}
-
+  Use this form to upload an image. You may also provide a title and code snippet. If you do include code, just include the code relevant to the creation of the image itself.<br>
+  Image formats are restricted to PNG, GIF and JPEG. Images smaller than 500x500 pixels will be enlarged.
   <form action="/send_file" method="POST" enctype="multipart/form-data">
+
     <input type="file" name="img_file">
     <textarea name="img_code"></textarea>
     <button type="submit" class="btn btn-primary">Submit</button>
