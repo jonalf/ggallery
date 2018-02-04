@@ -13,6 +13,8 @@ var display_image = function (image, title) {
   var mod = document.getElementsByClassName("modal-body")[0];
   var mod_title = document.getElementsByClassName("modal-title")[0];
   var mod_img = document.createElement('img');
+  mod_img.classList.add("img-responsive");
+  mod_img.classList.add("center-block");
 
   if (title != 'None')
     mod_title.innerHTML = title;
@@ -27,6 +29,7 @@ var display_image = function (image, title) {
     if (d['code']) {
       var p = document.createElement('pre');
       var c = document.createElement('code');
+      p.style = "margin-top: 10px";
       c.innerHTML = d['code'];
       p.appendChild(c);
       mod.appendChild(p);

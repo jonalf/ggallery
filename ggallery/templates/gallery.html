@@ -6,16 +6,17 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Modal title</h5>
+        <!-- <h5 class="modal-title">Modal title</h5> -->
+        <span class="modal-title"></span>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
+      <!-- <div class="modal-footer">
+           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+           </div> -->
     </div>
   </div>
 </div>
@@ -30,14 +31,14 @@
   <div class="row">
     {% for image in images %}
 
-    <!-- <div class="col-sm-3" onclick="display_image('{{url_for('static', filename='images/2017/scale/'+image['image'])}}', '{{image['title']}}')"> -->
     <div class="col-sm-3" onclick="display_image('{{image['image']}}', '{{image['title']}}')">
-      {% if image['title'] %}
-      {{ image['title'] }}
-      {% endif %}
-      <img src="{{ url_for('static', filename='images/%d/thumbs/%s'%(year, image['image'])) }}">
-      <br>
-      {{image['author']}}
+      <figure class="figure">
+        {% if image['title'] %}
+        <figcaption class="figure-caption">{{image['title']}}</figcaption>
+        {% endif %}
+        <img class="img-responvie" src="{{ url_for('static', filename='images/%d/thumbs/%s'%(year, image['image'])) }}">
+        <figcaption class="figure-caption">{{image['author']}}</figcaption>
+      </figure>
     </div>
     {% endfor %}
     </div> <!--row-->
