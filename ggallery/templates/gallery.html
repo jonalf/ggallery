@@ -32,7 +32,7 @@
     {% for image in images %}
     <figure class="figure" onclick="display_image('{{image['image']}}', '{{image['title']}}')">
       {% if image['title'] %}
-      <figcaption class="figure-caption figure-title">{{image['title']}}</figcaption>
+      <figcaption class="figure-caption figure-title">{{image['title'] | safe}}</figcaption>
       {% else %}
       <br>
       {% endif %}
