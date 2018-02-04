@@ -5,6 +5,16 @@
     padding: 10px;
 }
 
-.figure-caption {
+.figure-title {
     text-align: center;
+    font-weight: bold;
+}
+
+.flex-row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+figure {
+    padding-right: 15px;
 }

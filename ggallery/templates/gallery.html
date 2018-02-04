@@ -28,20 +28,17 @@
   <br>
   Click on an image for a larger version and code (if available)
   <hr>
-  <div class="row">
+  <div class="flex-row">
     {% for image in images %}
-
-    <div class="col-sm-3" onclick="display_image('{{image['image']}}', '{{image['title']}}')">
-      <figure class="figure">
-        {% if image['title'] %}
-        <figcaption class="figure-caption">{{image['title']}}</figcaption>
-        {% endif %}
-        <img class="img-responvie" src="{{ url_for('static', filename='images/%d/thumbs/%s'%(year, image['image'])) }}">
-        <figcaption class="figure-caption">{{image['author']}}</figcaption>
-      </figure>
-    </div>
+    <figure class="figure" onclick="display_image('{{image['image']}}', '{{image['title']}}')">
+      {% if image['title'] %}
+      <figcaption class="figure-caption figure-title">{{image['title']}}</figcaption>
+      {% endif %}
+      <img class="img-responvie" src="{{ url_for('static', filename='images/%d/thumbs/%s'%(year, image['image'])) }}">
+      <figcaption class="figure-caption">{{image['author']}}</figcaption>
+    </figure>
     {% endfor %}
-    </div> <!--row-->
+  </div> <!--row-->
 </div> <!-- /container -->
 
 {% endblock %}
