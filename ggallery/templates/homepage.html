@@ -10,12 +10,16 @@
   {% endfor %}
 
   <hr>
-  {% for gallery in galleries %}
-  <h3>
-    <a href="{{ url_for('gallery_view', gallery_name=gallery)}}">{{ gallery }}</a>
-  </h3>
-  <br>
-  {% endfor %}
+  <div class="flex-row">
+    {% for gallery in galleries %}
+    <figure class="figure">
+      <a href="{{ url_for('gallery_view', gallery_name=gallery)}}">
+        <img class="img-responsive" src="{{ url_for('static', filename='images/%d/thumbs/%s'%(year, thumbnails[gallery])) }}">
+        <figcaption class="figure-caption figure-caption-title">{{ gallery }}</figcaption>
+      </a>
+    </figure>
+    {% endfor %}
+  </div>
 </div> <!-- /container -->
 
 {% endblock %}

@@ -203,5 +203,12 @@ def code_exists(image_id):
     result = cur.fetchone()
     return result;
 
+def get_random_image(gallery):
+    db = sqlite3.connect( DBFILE )
+    cur = db.cursor()
+    cmd = 'SELECT * FROM images_%d WHERE gallery = ? ORDER BY RANDOM() LIMIT 1'%YEAR
+    cur.execute(cmd, (gallery,))
+    return cur.fetchone()
+
 if __name__ == '__main__':
     setup()

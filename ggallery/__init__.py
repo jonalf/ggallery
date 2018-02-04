@@ -52,7 +52,12 @@ def root():
         uname = session['user']
     else:
         uname = 'login'
-    return render_template("homepage.html", user=uname, galleries = galleries)
+    thumbnails = {}
+    for gallery in galleries:
+        display_img = db.get_random_image(gallery)
+        thumbnails[gallery] = '%d.%s'%(display_img[0], display_img[3])
+    print thumbnails
+    return render_template("homepage.html", user=uname, galleries = galleries, thumbnails=thumbnails, year=db.YEAR)
 
 @app.route('/upload', methods=['POST', 'GET'])
 @require_login

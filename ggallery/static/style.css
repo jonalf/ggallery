@@ -19,3 +19,11 @@ figure {
     padding-right: 15px;
     padding-bottom: 5px;
 }
+
+.figure-caption-title {
+    text-align: center;
+    font-size: x-large;
+    font-weight: bold;
+    padding-right: 15px;
+    padding-bottom: 5px;
+}
