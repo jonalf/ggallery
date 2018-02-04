@@ -33,7 +33,10 @@
     <figure class="figure" onclick="display_image('{{image['image']}}', '{{image['title']}}')">
       {% if image['title'] %}
       <figcaption class="figure-caption figure-title">{{image['title']}}</figcaption>
+      {% else %}
+      <br>
       {% endif %}
+
       <img class="img-responvie" src="{{ url_for('static', filename='images/%d/thumbs/%s'%(year, image['image'])) }}">
       <figcaption class="figure-caption">{{image['author']}}</figcaption>
     </figure>
