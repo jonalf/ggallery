@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-
 <html>
-
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
-    <title>Gallery</title>
+    <title>MKS66 Gallery</title>
   </head>
 
   <body>
@@ -14,7 +12,7 @@
     {% block navbar %}
     <nav class="navbar navbar-default navbar-static-top text-center">
       <div class="container-fluid">
-	      <a class="navbar-brand" href="/">Gallery</a>
+	      <a class="navbar-brand" href="/">MKS66</a>
 	      <div class="navbar-header">
 	        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
 	          <span class="sr-only">Toggle navigation</span>
@@ -28,11 +26,21 @@
 	      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
 	          <li><a href="/upload"> Upload</a></li>
-	          <li><a href="/gallery">Galleries</a></li>
+	          <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Gallery<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                {% for gallery in galleries %}
+                <li><a href="{{url_for('gallery_view', gallery_name=gallery)}}">{{gallery}}</a></li>
+                {% endfor %}
+              </ul>
+            </li>
 	        </ul>
 
 	        <ul class="nav navbar-nav navbar-right">
 	          <li><a href="/authenticate"> {{ user }}</a></li>
+            {% if rights == 1 %}
+            <li><a href="{{url_for('admin')}}">Admin</a></li>
+            {% endif %}
 	          <li><a href="/logout">Sign out</a></li>
 	        </ul>
 	      </div><!-- /.navbar-collapse -->

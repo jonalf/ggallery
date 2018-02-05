@@ -48,22 +48,23 @@ def require_login(f):
 @app.route('/', methods=['POST', 'GET'])
 def root():
     galleries = db.get_visible_galleries()
+    uname = 'login'
+    rights= db.USER
     if 'user' in session:
         uname = session['user']
-    else:
-        uname = 'login'
+        rights = session['rights']
     thumbnails = {}
     for gallery in galleries:
         display_img = db.get_random_image(gallery)
-        thumbnails[gallery] = '%d.%s'%(display_img[0], display_img[3])
-    print thumbnails
-    return render_template("homepage.html", user=uname, galleries = galleries, thumbnails=thumbnails, year=db.YEAR)
+        if display_img:
+            thumbnails[gallery] = '%d.%s'%(display_img[0], display_img[3])
+    return render_template("homepage.html", user=uname, galleries = galleries, thumbnails=thumbnails, year=db.YEAR, rights=rights)
 
 @app.route('/upload', methods=['POST', 'GET'])
 @require_login
 def upload():
     galleries = db.get_visible_galleries()
-    return render_template("upload.html", user=session['user'], galleries = galleries)
+    return render_template("upload.html", user=session['user'], galleries = galleries, rights=session['rights'])
 
 @app.route('/send_file', methods=['POST'])
 @require_login
@@ -100,11 +101,13 @@ def gallery_view(gallery_name=None):
     if not gallery_name:
         return redirect(url_for('root'))
     images = db.get_image_list(gallery_name)
+    galleries = db.get_visible_galleries()
+    rights = db.USER
+    uname = 'login'
     if 'user' in session:
         uname = session['user']
-    else:
-        uname = 'login'
-    return render_template('gallery.html', user=uname, gallery_name=gallery_name, images=images, year=YEAR)
+        rights = session['rights']
+    return render_template('gallery.html', user=uname, gallery_name=gallery_name, images=images, year=YEAR, galleries=galleries, rights=rights)
 
 @app.route('/get_image', methods=['POST'])
 def get_image():
@@ -116,6 +119,20 @@ def get_image():
     image_info['code'] = filer.get_code(int(image_id.split('.')[0]))
     return json.dumps(image_info)
 
+@app.route('/admin', methods=['POST', 'GET'])
+@require_login
+def admin():
+    galleries = db.get_visible_galleries()
+    return render_template('admin.html', user=session['user'], galleries=galleries, rights=session['rights'])
+
+@app.route('/add_gallery', methods=['POST'])
+@require_login
+def add_gallery():
+    print request.form
+    gallery_name = request.form['new_gallery']
+    db.add_gallery(gallery_name, db.EDITABLE)
+    flash('%s gallery created'%gallery_name)
+    return redirect( url_for('admin') )
 
 #EVERYTHING BELOW HERE IS FOR AUTHENTICATION
 @app.route('/authenticate', methods=['POST', 'GET'])
@@ -137,6 +154,7 @@ def authenticate():
         if domain == 'stuy.edu' and user_details:
             session['user'] = user
             session['name'] = user_details['name']
+            session['rights'] = user_details['rights']
             return redirect(url_for('root'))
         else:
             return render_template("homepage.html", message = (user + ' is not an approved user for this serive.'), user = 'Sign in')
@@ -151,6 +169,7 @@ def logout():
     session.pop('credentials')
     session.pop('user')
     session.pop('name')
+    session.pop('rights')
     return redirect( url_for('root') )
 
 

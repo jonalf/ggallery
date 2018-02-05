@@ -41,13 +41,13 @@ def build_galleries():
     cur.execute(cmd)
     db.commit()
 
-def add_gallery(name, year, permission):
+def add_gallery(name, permission):
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
 
     #cmd = 'INSERT INTO galleries VALUES(null, "%s", "%d", %d, 0)'%(name, year, permission)
     cmd = 'INSERT INTO galleries VALUES(null, ?, ?, ?, 0)'
-    cur.execute(cmd, (name, year, permission))
+    cur.execute(cmd, (name, YEAR, permission))
     db.commit()
 
 def build_users():

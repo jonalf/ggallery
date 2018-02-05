@@ -12,12 +12,14 @@
   <hr>
   <div class="flex-row">
     {% for gallery in galleries %}
+    {% if thumbnails[gallery] %}
     <figure class="figure">
       <a href="{{ url_for('gallery_view', gallery_name=gallery)}}">
         <img class="img-responsive" src="{{ url_for('static', filename='images/%d/thumbs/%s'%(year, thumbnails[gallery])) }}">
         <figcaption class="figure-caption figure-caption-title">{{ gallery }}</figcaption>
       </a>
     </figure>
+    {% endif %}
     {% endfor %}
   </div>
 </div> <!-- /container -->
