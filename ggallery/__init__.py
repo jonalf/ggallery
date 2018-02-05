@@ -33,6 +33,10 @@ CLIENT_SECRETS = DIR + '/client_secrets.json'
 YEAR = db.YEAR
 ADMIN_USERS = ['dw']
 
+f = open(DIR+'/data/secret_key.txt')
+app.secret_key = f.read()
+f.close()
+
 #authentication wrapper
 def require_login(f):
     @wraps(f)
@@ -128,7 +132,6 @@ def admin():
 @app.route('/add_gallery', methods=['POST'])
 @require_login
 def add_gallery():
-    print request.form
     gallery_name = request.form['new_gallery']
     db.add_gallery(gallery_name, db.EDITABLE)
     flash('%s gallery created'%gallery_name)
@@ -157,7 +160,8 @@ def authenticate():
             session['rights'] = user_details['rights']
             return redirect(url_for('root'))
         else:
-            return render_template("homepage.html", message = (user + ' is not an approved user for this serive.'), user = 'Sign in')
+            flash(user + ' is not an approved user for this serive.')
+            return redirect(url_for('root'))
 
 @app.route('/logout', methods=["POST", 'GET'])
 @require_login

@@ -155,7 +155,6 @@ def get_visible_galleries():
     cur.execute(cmd, (YEAR, VISIBLE, EDITABLE))
     galleries = cur.fetchall()
     galleries = [x[0] for x in galleries]
-    print galleries
     return galleries
 
 def get_editable_galleries():
