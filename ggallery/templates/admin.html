@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h2>Admin Tools</h2>
+  <hr>
+  {% set messages = get_flashed_messages() %}
+  {% for message in messages %}
+  <h3> {{ message }} </h3>
+  {% endfor %}
+  <br>
+  <h4>Add a New Gallery</h4>
+  <form class="form-inline" action="/add_gallery" method="POST">
+    <div class="form-group">
+      <label for="new_gallery">Gallery Name</label>
+      <input type="text" class="form-control" id="new_gallery" name="new_gallery">
+    </div>
+    <button type="submit" class="btn btn-default">Add</button>
+  </form>
+  <hr>
+
+</div> <!-- /container -->
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='scripts.js') }}"></script>
+
+{% endblock %}
