@@ -209,5 +209,13 @@ def get_random_image(gallery):
     cur.execute(cmd, (gallery,))
     return cur.fetchone()
 
+def get_user_images(stuyd):
+    db = sqlite3.connect( DBFILE )
+    cur = db.cursor()
+    cmd = 'SELECT id, gallery FROM images_%d WHERE author=?'%YEAR
+    cur.execute(cmd, (stuyd, ))
+    images = cur.fetchall()
+    return images
+
 if __name__ == '__main__':
     setup()
