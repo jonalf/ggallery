@@ -126,16 +126,51 @@ def get_image():
 @app.route('/admin', methods=['POST', 'GET'])
 @require_login
 def admin():
+    if session['rights'] != db.ADMIN:
+        flash(session['user'] + ' does not have admin rights')
+        return redirect(url_for('root'))
     galleries = db.get_visible_galleries()
     return render_template('admin.html', user=session['user'], galleries=galleries, rights=session['rights'])
 
 @app.route('/add_gallery', methods=['POST'])
 @require_login
 def add_gallery():
+    if session['rights'] != db.ADMIN:
+        flash(session['user'] + ' does not have admin rights')
+        return redirect(url_for('root'))
     gallery_name = request.form['new_gallery']
     db.add_gallery(gallery_name, db.EDITABLE)
     flash('%s gallery created'%gallery_name)
     return redirect( url_for('admin') )
+
+@app.route('/delete_image', methods=['POST'])
+@require_login
+def delete_image():
+    print request.form
+    if ('rm_gallery' not in request.form or
+        'rm_img_id' not in request.form ):
+        flash('Please select a gallery and image')
+        return redirect( url_for('admin'))
+    if session['rights'] != db.ADMIN:
+        flash(session['user'] + ' does not have admin rights')
+        return redirect(url_for('root'))
+    gallery = request.form['rm_gallery']
+    img_id = request.form['rm_img_id'].split('.')
+    print gallery
+    print img_id
+    filer.remove_file(int(img_id[0]), img_id[1])
+    db.remove_image(int(img_id[0]))
+    flash('%s from %s removed'%(img_id[0], gallery))
+    return redirect(url_for('admin'))
+
+@app.route('/get_img_list', methods=['POST'])
+@require_login
+def get_img_list():
+    if 'gallery' not in request.form:
+        return ''
+    gallery_name = request.form['gallery']
+    return json.dumps(db.get_image_list(gallery_name))
+
 
 #EVERYTHING BELOW HERE IS FOR AUTHENTICATION
 @app.route('/authenticate', methods=['POST', 'GET'])

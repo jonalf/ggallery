@@ -1,3 +1,4 @@
+
 var clear_modal = function() {
   var mod = document.getElementsByClassName("modal-body")[0];
   var mod_title = document.getElementsByClassName("modal-title")[0];
@@ -36,5 +37,19 @@ var display_image = function (image, title) {
     }
 
     $("#main_modal").modal();
+  });
+};
+
+var populateRMSelect = function() {
+  var gallery = document.getElementById('rm_gallery').value;
+  var selector = document.getElementById('rm_img_id');
+  $.post('/get_img_list', {'gallery':gallery}, function(d) {
+    d = JSON.parse(d);
+
+    for (var i=0; i<d.length; i++) {
+      var op = document.createElement('option');
+      op.innerHTML = d[i]['image'];
+      selector.appendChild( op );
+    }
   });
 };

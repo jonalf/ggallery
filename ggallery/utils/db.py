@@ -125,24 +125,24 @@ def add_image(author, year, gallery, img_format, code, title):
     db.commit()
     return image_id
 
-def remove_image(id, year):
+def remove_image(id):
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
 
     #cmd = 'SELECT gallery, format FROM images_%d WHERE id=%d'%(year, id)
-    cmd = 'SELECT gallery, format FROM images_%d WHERE id=?'%year
+    cmd = 'SELECT gallery, format FROM images_%d WHERE id=?'%YEAR
     cur.execute(cmd, (id,))
     entry = cur.fetchone()
     gallery = entry[0]
     img_format = entry[1]
 
     #cmd = 'DELETE FROM images_%d WHERE id=%d'%(year, id)
-    cmd = 'DELETE FROM images_%d WHERE id=?'%year
+    cmd = 'DELETE FROM images_%d WHERE id=?'%YEAR
     cur.execute(cmd, (id,))
-    cmd = 'DELETE FROM code_%d WHERE id=?'%year
+    cmd = 'DELETE FROM code_%d WHERE id=?'%YEAR
     cur.execute(cmd, (id,))
     cmd = 'UPDATE galleries SET size = size - 1 WHERE name = ? AND year = ?'
-    cur.execute(cmd, (gallery, year))
+    cur.execute(cmd, (gallery, YEAR))
     db.commit()
     return img_format
 
