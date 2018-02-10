@@ -43,6 +43,11 @@ var display_image = function (image, title) {
 var populateRMSelect = function() {
   var gallery = document.getElementById('rm_gallery').value;
   var selector = document.getElementById('rm_img_id');
+
+  while (selector.hasChildNodes()) {
+    selector.removeChild(selector.firstChild);
+  }
+
   $.post('/get_img_list', {'gallery':gallery}, function(d) {
     d = JSON.parse(d);
 
