@@ -1,5 +1,6 @@
 import sqlite3, csv
 from os import remove, stat, path
+from sys import argv
 
 DIR = path.dirname(__file__) or '.'
 DIR += '/'
@@ -218,4 +219,5 @@ def get_user_images(stuyd):
     return images
 
 if __name__ == '__main__':
-    setup()
+    #setup()
+    print get_user_images(argv[1])
