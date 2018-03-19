@@ -55,4 +55,4 @@ def remove_file(img_id, img_format):
     os.remove('%s/thumbs/%d.%s'%(path, img_id, img_format))
     os.remove('%s/scale/%d.%s'%(path, img_id, img_format))
     if db.code_exists(img_id):
-        os.remove('%s/code/%d.%s'%(path, img_id, img_format))
+        os.remove('%s/code/%d.%s'%(path, img_id, 'txt'))
