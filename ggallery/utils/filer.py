@@ -27,8 +27,10 @@ def add_file(img, img_id, code):
     thumb_img = img.clone()
     scale_img = img.clone()
 
-    thumb_img.transform(resize='%d>'%THUMB_SIZE)
-    thumb_img.transform(resize='%d>'%SCALE_SIZE)
+    #thumb_img.transform(resize='%d>'%THUMB_SIZE)
+    #thumb_img.transform(resize='%d>'%SCALE_SIZE)
+    thumb_img.resize(THUMB_SIZE, THUMB_SIZE)
+    scale_img.resize(SCALE_SIZE, SCALE_SIZE)
 
     path = DATA_DIR + str(YEAR)
     img.save(filename='%s/fullsize/%d.%s'%(path, img_id, img.format))

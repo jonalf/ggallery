@@ -1,6 +1,6 @@
 #NOTE
 #The imagemagick path in version 7 is incompatiable with wand
-#do this on mac: export MAGICK_HOME="/usr/local/Cellar/imagemagick@6/6.9.9-31" (check version #)
+#do this on mac: export MAGICK_HOME="/usr/local/Cellar/imagemagick@6/6.9.9-47" (check version #)
 #taken from https://stackoverflow.com/questions/37011291/python-wand-image-is-not-recognized
 
 #SETUP INSTRUCTIONS (for now)
