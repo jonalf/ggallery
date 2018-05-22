@@ -1,4 +1,3 @@
-
 var clear_modal = function() {
   var mod = document.getElementsByClassName("modal-body")[0];
   var mod_title = document.getElementsByClassName("modal-title")[0];
@@ -7,7 +6,6 @@ var clear_modal = function() {
     mod.removeChild(mod.firstChild);
   }
 };
-
 
 var display_image = function (image, title) {
   clear_modal();
@@ -35,7 +33,6 @@ var display_image = function (image, title) {
       p.appendChild(c);
       mod.appendChild(p);
     }
-
     $("#main_modal").modal();
   });
 };
@@ -58,3 +55,60 @@ var populateRMSelect = function() {
     }
   });
 };
+
+
+
+var upload_processing = function() {
+  var mod_title = document.getElementsByClassName("modal-title")[0];
+
+  mod_title.innerHTML = 'Please wait while the server uploads and processes your image';
+
+  $("#main_modal").modal();
+};
+
+var upload = function(e) {
+  console.log('upload!');
+  upload_processing();
+  var imgFile = document.getElementById('img_file');
+
+  //if no file selected, do nothing
+  if (imgFile.files.length == 0)
+    return;
+
+  var data = new FormData();
+  data.append('gallery', document.getElementById('gallery').value);
+  data.append('img_file', imgFile.files[0]);
+  data.append('img_code', document.getElementById('img_code').value);
+  data.append('title', document.getElementById('title').value);
+  console.log(data);
+  //create ajax call
+  var request = new XMLHttpRequest();
+  request.onreadystatechange = function() {
+    if(request.readyState == 4) {
+      try {
+        var resp = JSON.parse(request.response);
+      }
+      catch (e) {
+        var resp = {
+          status: 'error',
+          data: 'error'//'Unknown error occurred: [' + request.responseText + ']'
+        };
+      }
+      if (resp.status == 'nogo') {
+        window.location = '/upload';
+      }
+      if (resp.status == 'go') {
+        window.location = '/';
+      }
+
+    }
+  };
+
+  request.upload.addEventListener('progress',function(e) {
+    //_progress.style.width = Math.ceil(e.loaded/e.total) * 100 + '%';
+    console.log(e.loaded + ' ' + e.total);
+  }, false);
+
+  request.open('POST', '/send_file');
+  request.send(data);
+}

@@ -73,10 +73,12 @@ def upload():
 @app.route('/send_file', methods=['POST'])
 @require_login
 def save_file():
+    print request.form
+
     if ('gallery' not in request.form or
         request.form['gallery'] == 'Pick one'):
         flash('Please select the correct assignment gallery.')
-        return redirect(url_for('upload'))
+        return json.dumps({'status' : 'nogo'})#return redirect(url_for('upload'))
 
     gallery = request.form['gallery']
     img_file = request.files['img_file']
@@ -84,20 +86,25 @@ def save_file():
     img_title = Markup.escape(request.form['title'])
     if img_file.filename == '':
         flash('No File Selected')
-        return redirect(url_for('upload'))
+        #return redirect(url_for('upload'))
+        return json.dumps({'status' : 'nogo'})
 
     img = Image(file=img_file)
     if img.format not in ALLOWED_TYPES:
         flash('Your image must be a .png, .gif or .jpg file')
-        return redirect(url_for('upload'))
+        #return redirect(url_for('upload'))
+        return json.dumps({'status' : 'nogo'})
+
     img_id = db.add_image( session['user'], YEAR, gallery, img.format, img_code, img_title)
     if img_id < 1:
         flash('There was an error uploading your image, please try again')
     save_check = filer.add_file(img, img_id, img_code)
     if not save_check:
         flash('There was an error uploading your image, please try again. Make sure your image is a .png, .gif or .jpg file')
-        return redirect(url_for('upload'))
-    return redirect(url_for('root'))
+        #return redirect(url_for('upload'))
+        return json.dumps({'status' : 'nogo'})
+    return json.dumps({'status':'go'})
+    #return redirect(url_for('root'))
 
 @app.route('/gallery/<gallery_name>', methods=['GET'])
 @app.route('/gallery', methods=['GET'])

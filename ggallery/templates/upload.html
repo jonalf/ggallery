@@ -2,6 +2,20 @@
 
 {% block content %}
 
+<div class="modal fade" id="main_modal" data-keyboard="false" data-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- <h5 class="modal-title">Modal title</h5> -->
+        <span class="modal-title"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 <div class="container">
   <h2>File Upload</h2>
   <hr>
@@ -10,10 +24,13 @@
   <h3> {{ message }} </h3>
   {% endfor %}
   Use this form to upload an image. You may also provide a title and code snippet. If you do include code, just include the code relevant to the creation of the image itself.<br>
-  Image formats are restricted to PNG, GIF and JPEG. Images smaller than 500x500 pixels will be enlarged.
+  Image formats are restricted to PNG, GIF and JPEG. Images smaller than 500x500 pixels will be enlarged.<br>
+  <br>
+  Important note: Animated gifs take a while to upload and process, please do not leave this page while uploading until the process is complete.<br>
   <br>
   <br>
-  <form action="/send_file" method="POST" enctype="multipart/form-data">
+  <!-- <form action="/send_file" method="POST" enctype="multipart/form-data"> -->
+  <div>
     <div class="form-group">
       <div class="form-group-row">
         <label for="gallery" class="col-sm-3 col-form-label">Assignment</label>
@@ -39,12 +56,12 @@
     <div class="form-group-row">
       <label for="img_code" class="col-sm-3 col-form-label">Image Code (optional)</label>
       <div class="col-sm-9">
-        <textarea name="img_code" class="form-control" name="img_code" rows="10"></textarea>
+        <textarea name="img_code" class="form-control" id="img_code" rows="10"></textarea>
       </div>
     </div>
     <div class="form-group">
       <div class="col-sm-offset-3 col-sm-9">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" id="submit" class="btn btn-primary" onclick="upload()">Submit</button>
       </div>
     </div>
   </form>
@@ -54,5 +71,4 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='scripts.js') }}"></script>
-
 {% endblock %}
