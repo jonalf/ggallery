@@ -95,10 +95,10 @@ var upload = function(e) {
         };
       }
       if (resp.status == 'nogo') {
-        window.location = '/upload';
+        window.location = 'http://gallery.stuycs.org/upload';
       }
       if (resp.status == 'go') {
-        window.location = '/';
+          window.location = 'http://gallery.stuycs.org';
       }
 
     }
