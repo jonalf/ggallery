@@ -1,3 +1,9 @@
+#start of year
+#change YEAR up top
+#run setup_year to clear old users and make new tables
+#run filer.setup_year to create new folders for images
+#run add_user to add individual users or populate_users to batch add from file
+
 import sqlite3, csv
 from os import remove, stat, path
 from sys import argv
@@ -13,7 +19,7 @@ ADMIN = 1
 VISIBLE = 0
 EDITABLE = 1
 
-YEAR = 2018
+YEAR = 2019
 
 #create the database
 def setup():
