@@ -226,4 +226,15 @@ def get_user_images(stuyd):
 
 if __name__ == '__main__':
     #setup()
-    print get_user_images(argv[1])
+    if len(argv) < 2:
+        print 'Usage: db.py -c|v|s [username]'
+    elif (argv[1] == '-v'):
+        if len(argv) != 3:
+            print 'Usage: db.py -v [username]'
+        else:
+            print get_user_images(argv[2])
+    elif argv[1] == '-c':
+        user = raw_input("enter suyid: ")
+        name = raw_input("enter full name: ")
+        print 'making regular user account: %s %s'%(user, name)
+        add_user(user, name, USER)
