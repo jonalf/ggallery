@@ -216,6 +216,16 @@ def get_random_image(gallery):
     cur.execute(cmd, (gallery,))
     return cur.fetchone()
 
+def get_past_years():
+    db = sqlite3.connect( DBFILE )
+    cur = db.cursor()
+    cmd = 'SELECT year FROM galleries'
+    cur.execute(cmd)
+    ys = cur.fetchall()
+    years = {y[0] for y in ys}
+    return [y for y in years if y != YEAR]
+
+
 def get_user_images(stuyd):
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()

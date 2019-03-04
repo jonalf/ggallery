@@ -31,7 +31,7 @@ ALLOWED_TYPES = filer.ALLOWED_TYPES
 DIR = os.path.dirname(__file__) or '.'
 CLIENT_SECRETS = DIR + '/client_secrets.json'
 YEAR = db.YEAR
-ADMIN_USERS = ['dw']
+ADMIN_USERS = ['dw', 'konstans']
 
 f = open(DIR+'/data/secret_key.txt')
 app.secret_key = f.read()
@@ -52,6 +52,7 @@ def require_login(f):
 @app.route('/', methods=['POST', 'GET'])
 def root():
     galleries = db.get_visible_galleries()
+    years = db.get_past_years()
     uname = 'login'
     rights= db.USER
     if 'user' in session:
@@ -62,13 +63,14 @@ def root():
         display_img = db.get_random_image(gallery)
         if display_img:
             thumbnails[gallery] = '%d.%s'%(display_img[0], display_img[3])
-    return render_template("homepage.html", user=uname, galleries = galleries, thumbnails=thumbnails, year=db.YEAR, rights=rights)
+    return render_template("homepage.html", user=uname, galleries = galleries, thumbnails=thumbnails, year=db.YEAR, rights=rights, years = years)
 
 @app.route('/upload', methods=['POST', 'GET'])
 @require_login
 def upload():
     galleries = db.get_visible_galleries()
-    return render_template("upload.html", user=session['user'], galleries = galleries, rights=session['rights'])
+    years = db.get_past_years()
+    return render_template("upload.html", user=session['user'], galleries = galleries, rights=session['rights'], years = years)
 
 @app.route('/send_file', methods=['POST'])
 @require_login
@@ -113,12 +115,20 @@ def gallery_view(gallery_name=None):
         return redirect(url_for('root'))
     images = db.get_image_list(gallery_name)
     galleries = db.get_visible_galleries()
+    years = db.get_past_years()
     rights = db.USER
     uname = 'login'
     if 'user' in session:
         uname = session['user']
         rights = session['rights']
-    return render_template('gallery.html', user=uname, gallery_name=gallery_name, images=images, year=YEAR, galleries=galleries, rights=rights)
+    return render_template('gallery.html', user=uname, gallery_name=gallery_name, images=images, year=YEAR, galleries=galleries, rights=rights, years = years)
+
+@app.route('/archive/<year>', methods=['GET'])
+@app.route('/archive', methods=['GET'])
+def archive_view(year=None):
+    if not year:
+        return redirect(url_for('root'))
+    return redirect(url_for('root'))
 
 @app.route('/get_image', methods=['POST'])
 def get_image():
