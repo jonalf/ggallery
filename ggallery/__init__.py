@@ -86,6 +86,7 @@ def save_file():
     img_file = request.files['img_file']
     img_code = Markup.escape(request.form['img_code'])
     img_title = Markup.escape(request.form['title'])
+    img_title = img_title[:28]
     if img_file.filename == '':
         flash('No File Selected')
         #return redirect(url_for('upload'))
