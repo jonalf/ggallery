@@ -105,6 +105,7 @@ def save_file():
     if not save_check:
         flash('There was an error uploading your image, please try again. Make sure your image is a .png, .gif or .jpg file')
         #return redirect(url_for('upload'))
+        db.remove_image( img_id )
         return json.dumps({'status' : 'nogo'})
     return json.dumps({'status':'go'})
     #return redirect(url_for('root'))
