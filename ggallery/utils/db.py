@@ -19,7 +19,7 @@ ADMIN = 1
 VISIBLE = 0
 EDITABLE = 1
 
-YEAR = 2019
+YEAR = 2020
 
 #create the database
 def setup():
