@@ -115,30 +115,52 @@ def save_file():
 def gallery_view(gallery_name=None):
     if not gallery_name:
         return redirect(url_for('root'))
-    images = db.get_image_list(gallery_name)
-    galleries = db.get_visible_galleries()
+    year = request.args.get('yer')
+    if not year:
+        year = db.YEAR
+    else:
+        year = int(year)
+    images = db.get_image_list(gallery_name, year)
+    galleries = db.get_visible_galleries(db.YEAR)
     years = db.get_past_years()
     rights = db.USER
     uname = 'login'
     if 'user' in session:
         uname = session['user']
         rights = session['rights']
-    return render_template('gallery.html', user=uname, gallery_name=gallery_name, images=images, year=YEAR, galleries=galleries, rights=rights, years = years)
+    return render_template('gallery.html', user=uname, gallery_name=gallery_name, images=images, year=year, galleries=galleries, rights=rights, years = years)
 
 @app.route('/archive/<year>', methods=['GET'])
 @app.route('/archive', methods=['GET'])
 def archive_view(year=None):
     if not year:
         return redirect(url_for('root'))
+    galleries = db.get_visible_galleries(year)
+    year = int(year)
+    years = db.get_past_years()
+    uname = 'login'
+    rights= db.USER
+    if 'user' in session:
+        uname = session['user']
+        rights = session['rights']
+    thumbnails = {}
+    for gallery in galleries:
+        display_img = db.get_random_image(gallery, year)
+        if display_img:
+            thumbnails[gallery] = '%d.%s'%(display_img[0], display_img[3])
+    return render_template("homepage.html", user=uname, galleries = galleries, thumbnails=thumbnails, year=year, rights=rights, years = years)
     return redirect(url_for('root'))
 
 @app.route('/get_image', methods=['POST'])
 def get_image():
+    year = db.YEAR
     if 'image_id' not in request.form:
         return ''
+    if 'year' in request.form:
+        year = int(request.form['year'])
     image_id = request.form['image_id']
     image_info = {}
-    image_info['scale'] = url_for('static', filename='images/%d/scale/%s'%(YEAR, image_id));
+    image_info['scale'] = url_for('static', filename='images/%d/scale/%s'%(year, image_id));
     image_info['code'] = filer.get_code(int(image_id.split('.')[0]))
     return json.dumps(image_info)
 

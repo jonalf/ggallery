@@ -30,7 +30,7 @@
   <hr>
   <div class="flex-row">
     {% for image in images %}
-    <figure class="figure" onclick="display_image('{{image['image']}}', '{{image['title']}}')">
+    <figure class="figure" onclick="display_image('{{image['image']}}', '{{image['title']}}', '{{year}}')">
       {% if image['title'] %}
       <figcaption class="figure-caption figure-title">{{image['title'] | safe}}</figcaption>
       {% else %}

@@ -153,13 +153,13 @@ def remove_image(id):
     db.commit()
     return img_format
 
-def get_visible_galleries():
+def get_visible_galleries(year=YEAR):
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
 
     #cmd = 'SELECT name FROM galleries WHERE (year = %d) AND (perm = %d or perm = %d)'%(YEAR, VISIBLE, EDITABLE)
     cmd = 'SELECT name FROM galleries WHERE (year = ?) AND (perm = ? or perm = ?)'
-    cur.execute(cmd, (YEAR, VISIBLE, EDITABLE))
+    cur.execute(cmd, (year, VISIBLE, EDITABLE))
     galleries = cur.fetchall()
     galleries = [x[0] for x in galleries]
     return galleries
@@ -181,17 +181,24 @@ def lookup_user(stuyd):
     cur.execute(cmd, (stuyd,))
     user = cur.fetchone()
     if not user:
-        return false
+        return False
     return {'stuyd':user[1], 'name':user[2], 'rights':user[3]}
 
 def get_user_name(stuyd):
-    return lookup_user(stuyd)['name']
-
-def get_image_list(gallery):
+    #return lookup_user(stuyd)['name']
+    name = lookup_user(stuyd)
+    print '================'
+    print name
+    if name:
+        return name['name']
+    else:
+        return 'Clyde Sinclair'
+    
+def get_image_list(gallery, year=YEAR):
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
     #cmd = 'SELECT * FROM images_%d WHERE gallery = "%s"'%(YEAR, gallery)
-    cmd = 'SELECT * FROM images_%d WHERE gallery = ?'%YEAR
+    cmd = 'SELECT * FROM images_%d WHERE gallery = ?'%year
     cur.execute(cmd, (gallery,))
     images = cur.fetchall()
     image_list = []
@@ -209,10 +216,10 @@ def code_exists(image_id):
     result = cur.fetchone()
     return result;
 
-def get_random_image(gallery):
+def get_random_image(gallery, year=YEAR):
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
-    cmd = 'SELECT * FROM images_%d WHERE gallery = ? ORDER BY RANDOM() LIMIT 1'%YEAR
+    cmd = 'SELECT * FROM images_%d WHERE gallery = ? ORDER BY RANDOM() LIMIT 1'%year
     cur.execute(cmd, (gallery,))
     return cur.fetchone()
 

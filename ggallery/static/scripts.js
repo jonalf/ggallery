@@ -7,7 +7,7 @@ var clear_modal = function() {
   }
 };
 
-var display_image = function (image, title) {
+var display_image = function (image, title, year) {
   clear_modal();
   var mod = document.getElementsByClassName("modal-body")[0];
   var mod_title = document.getElementsByClassName("modal-title")[0];
@@ -18,7 +18,7 @@ var display_image = function (image, title) {
   if (title != 'None')
     mod_title.innerHTML = title;
 
-  $.post('/get_image', {'image_id':image}, function(d) {
+    $.post('/get_image', {'image_id':image, 'year':year}, function(d) {
     d = JSON.parse(d);
     console.log(d);
 
