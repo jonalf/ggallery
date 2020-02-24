@@ -67,48 +67,61 @@ var upload_processing = function() {
 };
 
 var upload = function(e) {
-  console.log('upload!');
-  upload_processing();
-  var imgFile = document.getElementById('img_file');
+    console.log('upload!');
+    upload_processing();
+    var imgFile = document.getElementById('img_file');
 
-  //if no file selected, do nothing
-  if (imgFile.files.length == 0)
-    return;
-
-  var data = new FormData();
-  data.append('gallery', document.getElementById('gallery').value);
-  data.append('img_file', imgFile.files[0]);
-  data.append('img_code', document.getElementById('img_code').value);
-  data.append('title', document.getElementById('title').value);
-  console.log(data);
-  //create ajax call
-  var request = new XMLHttpRequest();
-  request.onreadystatechange = function() {
-    if(request.readyState == 4) {
-      try {
-        var resp = JSON.parse(request.response);
-      }
-      catch (e) {
-        var resp = {
-          status: 'error',
-          data: 'error'//'Unknown error occurred: [' + request.responseText + ']'
-        };
-      }
-      if (resp.status == 'nogo') {
-        window.location = 'http://gallery.stuycs.org/upload';
-      }
-      if (resp.status == 'go') {
-          window.location = 'http://gallery.stuycs.org';
-      }
-
+    //if no file selected, do nothing
+    if (imgFile.files.length == 0) {
+	alert('No File Selected');
+	window.location = 'http://gallery.stuycs.org/upload';
+	return;
     }
-  };
+    var data = new FormData();
+    data.append('gallery', document.getElementById('gallery').value);
+    data.append('img_file', imgFile.files[0]);
+    data.append('img_code', document.getElementById('img_code').value);
+    data.append('title', document.getElementById('title').value);
+    console.log(data);
+    //create ajax call
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function() {
+	if(request.readyState == 4) {
+	    try {
+		var resp = JSON.parse(request.response);
+	    }
+	    catch (e) {
+		var resp = {
+		    status: 'error',
+		    data: 'error'//'Unknown error occurred: [' + request.responseText + ']'
+		};
+	    }
+	    console.log( resp.status );
+	    if (resp.status == 'nofile') {
+		window.alert('No File Selected');
+		window.location = 'http://gallery.stuycs.org/upload';
+	    }
+	    if (resp.status == 'format') {
+		//console.log(resp.status);
+		window.location = 'http://gallery.stuycs.org/upload';
+		//window.alert('Your image must be a .png, .gif or .jpg file');
+	    }
 
-  request.upload.addEventListener('progress',function(e) {
-    //_progress.style.width = Math.ceil(e.loaded/e.total) * 100 + '%';
-    console.log(e.loaded + ' ' + e.total);
-  }, false);
+	    if (resp.status == 'nogo') {
+		window.location = 'http://gallery.stuycs.org/upload';
+	    }
+	    if (resp.status == 'go') {
+		window.location = 'http://gallery.stuycs.org';
+	    }
+	    
+	}
+    };
 
-  request.open('POST', '/send_file');
-  request.send(data);
+    request.upload.addEventListener('progress',function(e) {
+	//_progress.style.width = Math.ceil(e.loaded/e.total) * 100 + '%';
+	console.log(e.loaded + ' ' + e.total);
+    }, false);
+
+    request.open('POST', '/send_file');
+    request.send(data);
 }

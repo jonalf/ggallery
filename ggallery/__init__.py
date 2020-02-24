@@ -87,18 +87,25 @@ def save_file():
     img_code = Markup.escape(request.form['img_code'])
     img_title = Markup.escape(request.form['title'])
     img_title = img_title[:28]
+    
     if img_file.filename == '':
         flash('No File Selected')
         #return redirect(url_for('upload'))
-        return json.dumps({'status' : 'nogo'})
+        return json.dumps({'status' : 'nofile'})
 
     img = Image(file=img_file)
+    
+    print '=========='
+    print img.format
+    
     if img.format not in ALLOWED_TYPES:
         flash('Your image must be a .png, .gif or .jpg file')
         #return redirect(url_for('upload'))
-        return json.dumps({'status' : 'nogo'})
+        return json.dumps({'status' : 'format'})
 
     img_id = db.add_image( session['user'], YEAR, gallery, img.format, img_code, img_title)
+    #print '=========='
+    #print img_id
     if img_id < 1:
         flash('There was an error uploading your image, please try again')
     save_check = filer.add_file(img, img_id, img_code)

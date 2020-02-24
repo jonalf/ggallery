@@ -187,8 +187,8 @@ def lookup_user(stuyd):
 def get_user_name(stuyd):
     #return lookup_user(stuyd)['name']
     name = lookup_user(stuyd)
-    print '================'
-    print name
+    #print '================'
+    #print name
     if name:
         return name['name']
     else:
