@@ -206,8 +206,14 @@ def delete_image():
     img_id = request.form['rm_img_id'].split('.')
     print gallery
     print img_id
-    filer.remove_file(int(img_id[0]), img_id[1])
-    db.remove_image(int(img_id[0]))
+    try:
+        filer.remove_file(int(img_id[0]), img_id[1])
+    except:
+        pass
+    try:
+        db.remove_image(int(img_id[0]))
+    except:
+        pass
     flash('%s from %s removed'%(img_id[0], gallery))
     return redirect(url_for('admin'))
 

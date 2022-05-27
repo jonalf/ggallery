@@ -2,6 +2,7 @@
 #change YEAR up top
 #run setup_year to clear old users and make new tables
 #run filer.setup_year to create new folders for images
+#make sure the owner for the new directories is www-data 
 #run add_user to add individual users or populate_users to batch add from file
 
 import sqlite3, csv
@@ -15,11 +16,12 @@ USER_FILE = DIR + '../data/users.csv'
 
 USER = 0
 ADMIN = 1
+ARCHIVE = 2
 
 VISIBLE = 0
 EDITABLE = 1
 
-YEAR = 2020
+YEAR = 2022
 
 #create the database
 def setup():
@@ -43,7 +45,7 @@ def build_galleries():
         cur.execute( cmd )
         db.commit()
     except:
-        print "galleries table does not exist"
+        print("galleries table does not exist")
     cmd = 'CREATE TABLE galleries (id INTEGER PRIMARY KEY, name TEXT, year INTEGER, perm INTEGER, size INTEGER)'
     cur.execute(cmd)
     db.commit()
@@ -57,18 +59,24 @@ def add_gallery(name, permission):
     cur.execute(cmd, (name, YEAR, permission))
     db.commit()
 
+# This should change to archive the old users (set priv to 2)
+# this was the SQL command used in spirng 2021
+# UPDATE users SET priv = 2 WHERE priv = 0;
 def build_users():
     db = sqlite3.connect( DBFILE )
     cur = db.cursor()
 
+    '''
+    #do not delte old users anymore
     try:
         cmd = "DROP TABLE users"
         cur.execute( cmd )
         db.commit()
     except:
         print "users table does not exist"
-
     cmd = 'CREATE TABLE users (id INTEGER PRIMARY KEY, stuyd TEXT, name TEXT, priv INTEGER)'
+    '''
+    cmd = 'UPDATE users SET priv = 2 WHERE priv = 0'
     cur.execute(cmd)
     db.commit()
     populate_users()
@@ -244,14 +252,28 @@ def get_user_images(stuyd):
 if __name__ == '__main__':
     #setup()
     if len(argv) < 2:
-        print 'Usage: db.py -c|v|s [username]'
+        print('Usage: db.py -c|v|s [username]')
     elif (argv[1] == '-v'):
         if len(argv) != 3:
-            print 'Usage: db.py -v [username]'
+            print('[view images] Usage: db.py -v [username]')
         else:
-            print get_user_images(argv[2])
+            print(get_user_images(argv[2]))
     elif argv[1] == '-c':
         user = raw_input("enter suyid: ")
         name = raw_input("enter full name: ")
-        print 'making regular user account: %s %s'%(user, name)
+        print('making regular user account: %s %s'%(user, name))
         add_user(user, name, USER)
+    elif argv[1] == '-p':
+        ans = raw_input('add users from %s y/N? '%USER_FILE)
+        if ans == 'y':
+            print('adding users')
+            populate_users()
+    elif argv[1] == '-s':
+        #run setup_year to clear old users and make new tables
+        #run filer.setup_year to create new folders for images
+        ans = raw_input("YEAR is set to: %d\nproceed with new year setup? (y/N)"%YEAR)
+        if (ans == 'y'):
+            print('Setting up database...')
+            setup_year()
+            print('Settting up file structure...')
+            filer.setup_year()

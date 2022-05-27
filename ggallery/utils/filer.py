@@ -1,6 +1,8 @@
 import os
 import db
-from wand.image import Image
+#from wand.image import Image
+from PIL import Image
+
 
 DIR = os.path.dirname(__file__) or '.'
 DIR += '/'
@@ -21,21 +23,44 @@ def setup_year():
     os.mkdir(path + 'scale')
     os.mkdir(path + 'code')
 
+
+def resize_gif(img, new_size):
+    frames = []
+    for i in range(img.n_frames):
+        img.seek(i)
+        frames.append(img.resize((new_size, new_size)))
+    return frames
+
 def add_file(img, img_id, code):
     if img.format not in ALLOWED_TYPES:
         return False
-    thumb_img = img.clone()
-    scale_img = img.clone()
+    #thumb_img = img.clone()
+    #scale_img = img.clone()
+    #thumb_img = img.copy()
+    #scale_img = img.copy()
 
-    #thumb_img.transform(resize='%d>'%THUMB_SIZE)
-    #thumb_img.transform(resize='%d>'%SCALE_SIZE)
-    thumb_img.resize(THUMB_SIZE, THUMB_SIZE)
-    scale_img.resize(SCALE_SIZE, SCALE_SIZE)
+    #thumb_img.resize(THUMB_SIZE, THUMB_SIZE)
+    #scale_img.resize(SCALE_SIZE, SCALE_SIZE)
 
     path = DATA_DIR + str(YEAR)
-    img.save(filename='%s/fullsize/%d.%s'%(path, img_id, img.format))
-    thumb_img.save(filename='%s/thumbs/%d.%s'%(path, img_id, img.format))
-    scale_img.save(filename='%s/scale/%d.%s'%(path, img_id, img.format))
+    if not img.is_animated:
+        thumb_img = img.resize((THUMB_SIZE, THUMB_SIZE))
+        scale_img = img.resize((SCALE_SIZE, SCALE_SIZE))
+        img.save(filename='%s/fullsize/%d.%s'%(path, img_id, img.format))
+        thumb_img.save(filename='%s/thumbs/%d.%s'%(path, img_id, img.format))
+        scale_img.save(filename='%s/scale/%d.%s'%(path, img_id, img.format))
+
+    else:
+        thumb_img = resize_gif(img, THUMB_SIZE)
+        scale_img = resize_gif(img, SCALE_SIZE)
+        imageio.mimsave('%s/fullsize/%d.%s'%(path, img_id, img.format), scale_img)
+        imageio.mimsave('%s/thumbs/%d.%s'%(path, img_id, img.format), thumb_img)
+        imageio.mimsave('%s/scale/%d.%s'%(path, img_id, img.format), scale_img)
+
+
+    #img.save(filename='%s/fullsize/%d.%s'%(path, img_id, img.format))
+    #thumb_img.save(filename='%s/thumbs/%d.%s'%(path, img_id, img.format))
+    #scale_img.save(filename='%s/scale/%d.%s'%(path, img_id, img.format))
 
     if code:
         f = open('%s/code/%d.txt'%(path, img_id), 'w')
