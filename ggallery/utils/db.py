@@ -106,7 +106,7 @@ def build_images(year):
         cur.execute( cmd )
         db.commit()
     except:
-        print "images table does not exist"
+        print("images table does not exist")
     cmd = 'CREATE TABLE images_%d (id INTEGER PRIMARY KEY, author TEXT, gallery TEXT, format TEXT, title TEXT)'%year
     cur.execute(cmd)
     db.commit()
@@ -119,7 +119,7 @@ def build_code(year):
         cur.execute( cmd )
         db.commit()
     except:
-        print "code table does not exist"
+        print("code table does not exist")
     cmd = 'CREATE TABLE code_%d (id INTEGER, author TEXT, gallery TEXT)'%year
     cur.execute(cmd)
     db.commit()

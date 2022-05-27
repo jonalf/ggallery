@@ -21,7 +21,8 @@ from functools import wraps
 from utils import db, filer
 import json
 import os
-from wand.image import Image
+#from wand.image import Image
+from PIL import Image
 
 app = Flask(__name__)
 app.secret_key = 'NOT SO SECRET'
@@ -42,7 +43,7 @@ def require_login(f):
     @wraps(f)
     def inner(*args, **kwargs):
         if 'user' not in session:
-            print 'not logged in'
+            print('not logged in')
             return render_template("base.html", message = 'Please sign in above with your stuy.edu account', user = 'Sign In')
         else:
             return f(*args, **kwargs)
@@ -75,7 +76,7 @@ def upload():
 @app.route('/send_file', methods=['POST'])
 @require_login
 def save_file():
-    print request.form
+    print(request.form)
 
     if ('gallery' not in request.form or
         request.form['gallery'] == 'Pick one'):
@@ -93,10 +94,10 @@ def save_file():
         #return redirect(url_for('upload'))
         return json.dumps({'status' : 'nofile'})
 
-    img = Image(file=img_file)
+    img = Image.open(img_file)
     
-    print '=========='
-    print img.format
+    print('==========')
+    print(img.format)
     
     if img.format not in ALLOWED_TYPES:
         flash('Your image must be a .png, .gif or .jpg file')
@@ -194,7 +195,7 @@ def add_gallery():
 @app.route('/delete_image', methods=['POST'])
 @require_login
 def delete_image():
-    print request.form
+    print(request.form)
     if ('rm_gallery' not in request.form or
         'rm_img_id' not in request.form ):
         flash('Please select a gallery and image')
@@ -204,8 +205,8 @@ def delete_image():
         return redirect(url_for('root'))
     gallery = request.form['rm_gallery']
     img_id = request.form['rm_img_id'].split('.')
-    print gallery
-    print img_id
+    print(gallery)
+    print(img_id)
     try:
         filer.remove_file(int(img_id[0]), img_id[1])
     except:
